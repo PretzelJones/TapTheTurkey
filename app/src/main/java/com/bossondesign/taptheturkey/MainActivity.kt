@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             turkey.startAnimation(TranslateAnimation(0f, 20f, 0f, 20f).apply {
                 duration = 10
 
-                repeatCount = 15
+                repeatCount = 20
                 onPause()
                 mp!!.start()
 
