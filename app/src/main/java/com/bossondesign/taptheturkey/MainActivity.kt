@@ -18,11 +18,13 @@ class MainActivity : AppCompatActivity() {
         val mp = MediaPlayer.create(this, R.raw.gobble)
 
         turkey.setOnClickListener {
-
+            
+            //handles animation
             turkey.startAnimation(TranslateAnimation(0f, 20f, 0f, 20f).apply {
                 duration = 10
-
                 repeatCount = 20
+                
+                //plays sound
                 onPause()
                 mp!!.start()
 
