@@ -10,7 +10,7 @@ object TurkeyFlasher {
 
     private val handler = Handler(Looper.getMainLooper())
     var isFlashing = false
-    private val flashInterval: Long = 100 // Flash every 100 milliseconds (fast!)
+    private val flashInterval: Long = 100
 
     /**
      * Starts the rapid color flash effect on the turkey.
@@ -21,7 +21,6 @@ object TurkeyFlasher {
         isFlashing = true
         var isToggledOn = false
 
-        // 1. Define the Runnable for rapid toggling
         val flashRunnable = object : Runnable {
             override fun run() {
                 isToggledOn = !isToggledOn
@@ -32,40 +31,34 @@ object TurkeyFlasher {
             }
         }
 
-        // 2. Start the flashing immediately
         handler.post(flashRunnable)
 
-        // 3. Schedule the stop based on the total duration
+        // FIX: Ensure stopFlashing is called with the required (optional) parameter.
         handler.postDelayed({
-            stopFlashing(turkey)
+            stopFlashing(turkey, durationMs)
         }, durationMs)
     }
 
     /**
      * Stops the flashing and resets the turkey's color to normal.
+     * The durationMs is optional but included to satisfy the internal call from startFlashing.
      */
-    fun stopFlashing(turkey: ImageView) {
+    fun stopFlashing(turkey: ImageView, durationMs: Long = 0) {
         isFlashing = false
         handler.removeCallbacksAndMessages(null)
-        // Ensure the turkey returns to its original color (no tint)
         setTurkeyTint(turkey, false)
     }
 
-    // CRITICAL: Mutate and setImageDrawable are used here for reliable tinting/clearing
     private fun setTurkeyTint(turkey: ImageView, applyRedTint: Boolean) {
         val originalDrawable = turkey.drawable ?: return
-
-        // Mutate ensures we modify only this drawable instance.
         val wrappedDrawable = DrawableCompat.wrap(originalDrawable.mutate())
 
         if (applyRedTint) {
             DrawableCompat.setTint(wrappedDrawable, Color.RED)
         } else {
-            // Clear the tint by setting the tint list to null
             DrawableCompat.setTintList(wrappedDrawable, null)
         }
 
-        // Re-assigning the drawable forces the ImageView to refresh and apply the change.
         turkey.setImageDrawable(wrappedDrawable)
     }
 }

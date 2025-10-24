@@ -20,7 +20,7 @@ object DifficultyManager {
     private var currentLevelIndex = 0
     private const val WINNER_INDEX = 5 // Index for the special WINNER state (one beyond the last normal level)
 
-    // NEW: Listener interface for external actions (like graphics updates/pauses)
+    // Listener interface for external actions (like graphics updates/pauses)
     interface LevelChangeListener {
         fun onLevelUp(settings: GameSettings)
     }
@@ -37,39 +37,40 @@ object DifficultyManager {
             levelName = "Rookie", scoreThreshold = 0,
             moveDelayMs = 800L, flashChancePercent = 15, missPenalty = 1,
             allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.TINY }, // Exclude TINY
-            turkeyBaseResId = R.drawable.turkey, backgroundResId = R.drawable.background
+            turkeyBaseResId = R.drawable.turkey_1,
+            backgroundResId = R.drawable.background // Placeholder
         ),
-        // Level 1 (II: Sharpshooter) - Score 5+ (using temporary test score)
+        // Level 1 (II: Sharpshooter) - Score 30+ (using temporary test score 5)
         GameSettings(
-            levelName = "Sharpshooter", scoreThreshold = 2,
-            //levelName = "Sharpshooter", scoreThreshold = 30,
+            levelName = "Sharpshooter", scoreThreshold = 5,
             moveDelayMs = 700L, flashChancePercent = 25, missPenalty = 1,
             allowedAppearances = TurkeyAppearance.APPEARANCES, // All 6 sizes are active
-            turkeyBaseResId = R.drawable.turkey, backgroundResId = R.drawable.background // Use placeholder
+            turkeyBaseResId = R.drawable.turkey_2,
+            backgroundResId = R.drawable.background // Placeholder
         ),
-        // Level 2 (III: Expert) - Score 10+ (using temporary test score)
+        // Level 2 (III: Expert) - Score 75+ (using temporary test score 10)
         GameSettings(
-            levelName = "Expert", scoreThreshold = 4,
-            //levelName = "Expert", scoreThreshold = 75,
+            levelName = "Expert", scoreThreshold = 10,
             moveDelayMs = 600L, flashChancePercent = 35, missPenalty = 2,
             allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.HUGE }, // Exclude HUGE
-            turkeyBaseResId = R.drawable.turkey, backgroundResId = R.drawable.background // Use placeholder
+            turkeyBaseResId = R.drawable.turkey_3,
+            backgroundResId = R.drawable.background // Placeholder
         ),
-        // Level 3 (IV: Master) - Score 15+ (using temporary test score)
+        // Level 3 (IV: Master) - Score 150+ (using temporary test score 15)
         GameSettings(
-            levelName = "Master", scoreThreshold = 6,
-            //levelName = "Master", scoreThreshold = 150,
+            levelName = "Master", scoreThreshold = 15,
             moveDelayMs = 500L, flashChancePercent = 50, missPenalty = 3,
             allowedAppearances = listOf(TurkeyAppearance.TINY, TurkeyAppearance.SMALL, TurkeyAppearance.MEDIUM_SMALL, TurkeyAppearance.MEDIUM),
-            turkeyBaseResId = R.drawable.turkey, backgroundResId = R.drawable.background // Use placeholder
+            turkeyBaseResId = R.drawable.turkey_4,
+            backgroundResId = R.drawable.background // Placeholder
         ),
-        // Level 4 (V: Legendary) - Score 20+ (using temporary test score)
+        // Level 4 (V: Legendary) - Score 220+ (using temporary test score 20)
         GameSettings(
-            levelName = "Legendary", scoreThreshold = 8,
-            //levelName = "Legendary", scoreThreshold = 220,
+            levelName = "Legendary", scoreThreshold = 20,
             moveDelayMs = 400L, flashChancePercent = 60, missPenalty = 4,
             allowedAppearances = listOf(TurkeyAppearance.TINY, TurkeyAppearance.SMALL), // Only the two smallest targets
-            turkeyBaseResId = R.drawable.turkey, backgroundResId = R.drawable.background // Use placeholder
+            turkeyBaseResId = R.drawable.turkey_5,
+            backgroundResId = R.drawable.background // Placeholder
         )
     )
 
@@ -88,16 +89,16 @@ object DifficultyManager {
 
         // 1. Handle WINNER state first
         if (currentScore >= WIN_SCORE) {
-            // Only trigger if we are not already in the WINNER state
-            if (currentLevelIndex < levelSettings.size) {
+            if (currentLevelIndex < levelSettings.size) { // Only trigger if not already in WINNER state
                 levelChangeListener?.onLevelUp(getWinSettings())
                 currentLevelIndex = WINNER_INDEX
+                return true
             }
-            return true
+            return false
         }
 
         // 2. Determine the highest level index reached
-        var newLevelIndex = currentLevelIndex
+        var newLevelIndex = 0
         for (i in levelSettings.indices.reversed()) {
             if (currentScore >= levelSettings[i].scoreThreshold) {
                 newLevelIndex = i
@@ -105,7 +106,7 @@ object DifficultyManager {
             }
         }
 
-        // 3. CRITICAL FIX: Only trigger onLevelUp if the level index has genuinely INCREASED
+        // 3. Only trigger onLevelUp if the level index has genuinely INCREASED
         if (newLevelIndex > currentLevelIndex) {
             currentLevelIndex = newLevelIndex
             // Trigger the level up callback in MainActivity for graphics/pause/heart refill
@@ -113,13 +114,13 @@ object DifficultyManager {
             return true
         }
 
-        // Level was not progressed (score dipped or stayed the same)
+        // Level was not progressed
         return false
     }
 
     /**
      * Applies the current level's settings to the game components.
-     * Called both on start and after a level-up transition.
+     * This primarily updates TurkeyMover's parameters.
      */
     fun applyCurrentSettings(turkey: ImageView, gameBoundary: View, topOffset: Int) {
         val settings = getCurrentSettings()
@@ -128,7 +129,7 @@ object DifficultyManager {
         TurkeyMover.updateMovementParams(
             moveDelayMs = settings.moveDelayMs,
             flashChancePercent = settings.flashChancePercent,
-            missPenalty = settings.missPenalty, // Pass the new miss penalty
+            missPenalty = settings.missPenalty,
             allowedAppearances = settings.allowedAppearances,
             turkey = turkey,
             boundaryView = gameBoundary,
@@ -147,12 +148,12 @@ object DifficultyManager {
      * Defines the special settings for the Win State.
      */
     private fun getWinSettings(): GameSettings {
-        // NOTE: Replace R.drawable.turkey_cooked and R.drawable.background_win with your final assets
         return GameSettings(
             levelName = "WINNER", scoreThreshold = WIN_SCORE,
             moveDelayMs = 0L, flashChancePercent = 0, missPenalty = 0,
-            allowedAppearances = emptyList(), // No movement/size changes in WIN state
-            turkeyBaseResId = R.drawable.turkey, backgroundResId = R.drawable.background
+            allowedAppearances = emptyList(),
+            turkeyBaseResId = R.drawable.turkey_6, // Cooked Turkey
+            backgroundResId = R.drawable.background // Placeholder
         )
     }
 }

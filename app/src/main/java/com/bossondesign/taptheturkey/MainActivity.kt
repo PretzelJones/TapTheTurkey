@@ -12,25 +12,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 
-// Implement the LevelChangeListener interface to handle milestones
 class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener {
 
-    // Global UI components
     private lateinit var turkey: ImageView
     private lateinit var scoreTextView: TextView
     private lateinit var gameBoundary: ConstraintLayout
     private lateinit var heartViews: List<ImageView>
-    private lateinit var gameOverOverlay: View // The overlay for Game Over/Win screen
-    private lateinit var gameOverText: TextView
+    private lateinit var gameOverOverlay: View
+    // REMOVED: private lateinit var gameOverText: TextView // This line is gone
     private lateinit var restartButton: Button
+    private lateinit var gameOverImage: ImageView
 
-    // Game State variables
     private var score: Int = 0
     private var health: Int = 3
-    private var isGameOver: Boolean = false // Set to true for Game Over or Win State
+    private var isGameOver: Boolean = false
     private lateinit var mp: MediaPlayer
 
-    // Calculated offset for movement boundary
     private var topAreaHeight: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,12 +40,11 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         gameBoundary = findViewById(R.id.rootConstraintLayout)
         val privacyTextView = findViewById<TextView>(R.id.textPrivacy)
 
-        // Initialize Game Over UI (assuming you add these IDs to your XML)
         gameOverOverlay = findViewById(R.id.gameOverOverlay)
-        gameOverText = findViewById(R.id.gameOverText)
+        // REMOVED: gameOverText = findViewById(R.id.gameOverText) // This line is gone
         restartButton = findViewById(R.id.restartButton)
+        gameOverImage = findViewById(R.id.gameOverImage)
 
-        // Initialize heart ImageViews (IDs from activity_main.xml)
         heartViews = listOf(
             findViewById(R.id.heart1),
             findViewById(R.id.heart2),
@@ -58,21 +54,18 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         // 2. Setup systems
         mp = MediaPlayer.create(this, R.raw.gobble)
         privacyTextView.movementMethod = LinkMovementMethod.getInstance()
-
-        // Set the MainActivity as the listener for level-up events
         DifficultyManager.setLevelChangeListener(this)
-
-        // Set up restart button listener
-        restartButton.setOnClickListener {
-            resetGame()
-        }
+        restartButton.setOnClickListener { resetGame() }
 
         // 3. Set up listeners (Game Logic)
         setupTurkeyClickListener()
         setupMissClickListener()
 
-        // 4. Start the game flow
-        resetGame() // Call resetGame() to initialize the state and start movement
+        // 4. Calculate boundary and start the game flow
+        gameBoundary.post {
+            topAreaHeight = scoreTextView.bottom + scoreTextView.paddingBottom
+            resetGame()
+        }
     }
 
     // --- LISTENER SETUP ---
@@ -81,22 +74,19 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         turkey.setOnClickListener {
             if (isGameOver) return@setOnClickListener
 
-            // Check if the tap was a RED PENALTY
             if (TurkeyMover.isRed) {
-                // RED PENALTY: Lose a heart
                 health--
                 updateHearts()
-                checkGameOverOrWin()
             } else {
-                // NORMAL HIT: Gain 1 point
                 score++
                 updateScoreText()
-                checkGameOverOrWin()
             }
 
             TurkeyAnimator.shake(turkey)
             if (mp.isPlaying) { mp.stop(); mp.prepare() }
             mp.start()
+
+            checkGameOverAndWinConditions()
         }
     }
 
@@ -104,15 +94,12 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         gameBoundary.setOnClickListener {
             if (isGameOver) return@setOnClickListener
 
-            // MISS PENALTY: Deduct points based on the current level's setting
             val missPenalty = DifficultyManager.getCurrentSettings().missPenalty
             score -= missPenalty
-
-            // Prevent score from dropping below zero
             if (score < 0) score = 0
-
             updateScoreText()
-            checkGameOverOrWin()
+
+            checkGameOverAndWinConditions()
         }
     }
 
@@ -123,7 +110,6 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
     }
 
     private fun updateHearts() {
-        // You would use R.drawable.heart_full and R.drawable.heart_empty here
         val fullHeartDrawable = ContextCompat.getDrawable(this, R.drawable.heart_full)
         val emptyHeartDrawable = ContextCompat.getDrawable(this, R.drawable.heart_empty)
 
@@ -132,87 +118,78 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         }
     }
 
-    private fun checkGameOverOrWin() {
-        // Check for Win Condition
-        if (score >= 250) {
-            isGameOver = true
-            TurkeyMover.stopMovement()
-            gameOverText.text = "YOU WIN! Final Score: $score"
-            gameOverOverlay.visibility = View.VISIBLE
-            return
-        }
-
-        // Check for Game Over Condition
+    private fun checkGameOverAndWinConditions() {
         if (health <= 0) {
             isGameOver = true
             TurkeyMover.stopMovement()
-            gameOverText.text = "GAME OVER! Final Score: $score"
+            // REMOVED: gameOverText.text = "GAME OVER! Final Score: $score" // This line is gone
+            gameOverImage.setImageResource(R.drawable.turkey_sad)
             gameOverOverlay.visibility = View.VISIBLE
             return
         }
 
-        // Check difficulty after every state change (hit or miss)
-        val scoreOffset = scoreTextView.bottom + scoreTextView.paddingBottom
-        DifficultyManager.checkAndUpdateDifficulty(score, turkey, gameBoundary, scoreOffset)
+        DifficultyManager.checkAndUpdateDifficulty(score, turkey, gameBoundary, topAreaHeight)
     }
 
     /**
-     * Implements the level change logic (Graphics/Pause).
+     * Called by DifficultyManager when a new level is achieved (or game is won).
      */
     override fun onLevelUp(settings: GameSettings) {
-        // 1. Stop the game flow
         TurkeyMover.stopMovement()
 
-        // 2. APPLY HEART REFILL LOGIC
-        if (settings.levelName != "WINNER") {
-            health = 3 // Refill health to max
-            updateHearts() // Update the UI to show full hearts
-        }
-
-        // 3. Apply New Graphics/Assets
         gameBoundary.setBackgroundResource(settings.backgroundResId)
         turkey.setImageResource(settings.turkeyBaseResId)
 
-        // 4. PAUSE/TRANSITION LOGIC (Currently immediate resume)
-
-        // 5. Resume the game
-        val scoreOffset = scoreTextView.bottom + scoreTextView.paddingBottom
         if (settings.levelName == "WINNER") {
-            // The Win state is handled separately and doesn't resume movement
+            isGameOver = true
+            // REMOVED: gameOverText.text = "YOU WIN! Final Score: $score" // This line is gone
+            gameOverImage.setImageResource(settings.turkeyBaseResId)
+            gameOverOverlay.visibility = View.VISIBLE
         } else {
-            // Apply new difficulty settings and restart movement
-            DifficultyManager.applyCurrentSettings(turkey, gameBoundary, scoreOffset)
+            health = 3
+            updateHearts()
+
+            TurkeyMover.startMovement(
+                settings.moveDelayMs,
+                settings.flashChancePercent,
+                settings.missPenalty,
+                settings.allowedAppearances,
+                turkey,
+                gameBoundary,
+                topAreaHeight
+            )
             Toast.makeText(this, "LEVEL UP! Now ${settings.levelName}", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun resetGame() {
-        // Reset state variables
         score = 0
         health = 3
         isGameOver = false
 
-        // Reset difficulty manager
         DifficultyManager.resetGame()
 
-        // Reset UI
         updateScoreText()
         updateHearts()
         gameOverOverlay.visibility = View.GONE
 
-        // Calculate boundary and start movement using initial settings (Level 0)
-        gameBoundary.post {
-            topAreaHeight = scoreTextView.bottom + scoreTextView.paddingBottom
-            // The initial state is applied via applyCurrentSettings
-            DifficultyManager.applyCurrentSettings(turkey, gameBoundary, topAreaHeight)
-        }
-    }
+        val initialSettings = DifficultyManager.getCurrentSettings()
+        turkey.setImageResource(initialSettings.turkeyBaseResId)
 
+        TurkeyMover.startMovement(
+            initialSettings.moveDelayMs,
+            initialSettings.flashChancePercent,
+            initialSettings.missPenalty,
+            initialSettings.allowedAppearances,
+            turkey,
+            gameBoundary,
+            topAreaHeight
+        )
+    }
 
     override fun onDestroy() {
         super.onDestroy()
         TurkeyMover.stopMovement()
-        TurkeyFlasher.stopFlashing(turkey)
         mp.release()
     }
 }
@@ -244,7 +221,7 @@ class MainActivity : AppCompatActivity() {
         textView.movementMethod = LinkMovementMethod.getInstance()
 
         turkey.setOnClickListener {
-            
+
             //handles animation
             turkey.startAnimation(TranslateAnimation(0f, 20f, 0f, 20f).apply {
                 duration = 10
