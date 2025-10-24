@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Tap the Turkey</string>
     <string name="privacy"><a href="https://docs.google.com/document/d/1-fe-yLiMjwpXYkCfNhXHDd0caqwMuWnudjJDkY0popQ/edit?usp=sharing">Privacy Policy</a></string>
+    <string name="privacy_policy">Privacy Policy</string>
 </resources>
