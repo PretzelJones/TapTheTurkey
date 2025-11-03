@@ -138,14 +138,25 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         TurkeyMover.stopMovement()
 
         gameBoundary.setBackgroundResource(settings.backgroundResId)
-        turkey.setImageResource(settings.turkeyBaseResId)
 
         if (settings.levelName == "WINNER") {
             isGameOver = true
-            // REMOVED: gameOverText.text = "YOU WIN! Final Score: $score" // This line is gone
+
+            // 1. Assign the win graphic (e.g., 'win' image) to the OVERLAY view
             gameOverImage.setImageResource(settings.turkeyBaseResId)
+
+            // 2. Hide the tappable turkey
+            turkey.visibility = View.INVISIBLE // Correctly hides the active turkey
+
+            // 3. Show the final screen
+            gameOverImage.visibility = View.VISIBLE // Ensure the new image is visible
             gameOverOverlay.visibility = View.VISIBLE
+
         } else {
+            // --- NORMAL LEVEL UP LOGIC ---
+            // ONLY set the image source when we are NOT winning
+            turkey.setImageResource(settings.turkeyBaseResId) // <-- MOVED HERE
+
             health = 3
             updateHearts()
 
@@ -172,6 +183,7 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         updateScoreText()
         updateHearts()
         gameOverOverlay.visibility = View.GONE
+        turkey.visibility = View.VISIBLE
 
         val initialSettings = DifficultyManager.getCurrentSettings()
         turkey.setImageResource(initialSettings.turkeyBaseResId)

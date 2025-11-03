@@ -35,23 +35,25 @@ object DifficultyManager {
         // Level 0 (I: Rookie) - Score 0+
         GameSettings(
             levelName = "Rookie", scoreThreshold = 0,
-            moveDelayMs = 800L, flashChancePercent = 15, missPenalty = 1,
-            allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.TINY }, // Exclude TINY
+            moveDelayMs = 1200L, flashChancePercent = 15, missPenalty = 1,
+            //allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.TINY }, // Exclude TINY
+            allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.TINY && it != TurkeyAppearance.SMALL && it != TurkeyAppearance.MEDIUM_SMALL },
             turkeyBaseResId = R.drawable.turkey_1,
             backgroundResId = R.drawable.background // Placeholder
         ),
         // Level 1 (II: Sharpshooter) - Score 30+ (using temporary test score 5)
         GameSettings(
             levelName = "Sharpshooter", scoreThreshold = 5,
-            moveDelayMs = 700L, flashChancePercent = 25, missPenalty = 1,
-            allowedAppearances = TurkeyAppearance.APPEARANCES, // All 6 sizes are active
+            moveDelayMs = 1000L, flashChancePercent = 25, missPenalty = 1,
+            //allowedAppearances = TurkeyAppearance.APPEARANCES, // All 6 sizes are active
+            allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.TINY && it != TurkeyAppearance.SMALL },
             turkeyBaseResId = R.drawable.turkey_2,
             backgroundResId = R.drawable.background // Placeholder
         ),
         // Level 2 (III: Expert) - Score 75+ (using temporary test score 10)
         GameSettings(
             levelName = "Expert", scoreThreshold = 10,
-            moveDelayMs = 600L, flashChancePercent = 35, missPenalty = 2,
+            moveDelayMs = 800L, flashChancePercent = 35, missPenalty = 2,
             allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.HUGE }, // Exclude HUGE
             turkeyBaseResId = R.drawable.turkey_3,
             backgroundResId = R.drawable.background // Placeholder
@@ -59,7 +61,7 @@ object DifficultyManager {
         // Level 3 (IV: Master) - Score 150+ (using temporary test score 15)
         GameSettings(
             levelName = "Master", scoreThreshold = 15,
-            moveDelayMs = 500L, flashChancePercent = 50, missPenalty = 3,
+            moveDelayMs = 700L, flashChancePercent = 50, missPenalty = 2,
             allowedAppearances = listOf(TurkeyAppearance.TINY, TurkeyAppearance.SMALL, TurkeyAppearance.MEDIUM_SMALL, TurkeyAppearance.MEDIUM),
             turkeyBaseResId = R.drawable.turkey_4,
             backgroundResId = R.drawable.background // Placeholder
@@ -67,15 +69,15 @@ object DifficultyManager {
         // Level 4 (V: Legendary) - Score 220+ (using temporary test score 20)
         GameSettings(
             levelName = "Legendary", scoreThreshold = 20,
-            moveDelayMs = 400L, flashChancePercent = 60, missPenalty = 4,
+            moveDelayMs = 600L, flashChancePercent = 60, missPenalty = 3,
             allowedAppearances = listOf(TurkeyAppearance.TINY, TurkeyAppearance.SMALL), // Only the two smallest targets
             turkeyBaseResId = R.drawable.turkey_5,
             backgroundResId = R.drawable.background // Placeholder
         )
     )
 
-    private val WIN_SCORE = 250 // Score to trigger the final win state
-
+    //private val WIN_SCORE = 250 // Score to trigger the final win state
+    private val WIN_SCORE = 25
     // Helper function to safely get settings, handles WINNER state
     fun getCurrentSettings(): GameSettings {
         return if (currentLevelIndex >= levelSettings.size) getWinSettings() else levelSettings[currentLevelIndex]
@@ -152,7 +154,8 @@ object DifficultyManager {
             levelName = "WINNER", scoreThreshold = WIN_SCORE,
             moveDelayMs = 0L, flashChancePercent = 0, missPenalty = 0,
             allowedAppearances = emptyList(),
-            turkeyBaseResId = R.drawable.turkey_6, // Cooked Turkey
+            //turkeyBaseResId = R.drawable.turkey_6, // Cooked Turkey
+            turkeyBaseResId = R.drawable.win,
             backgroundResId = R.drawable.background // Placeholder
         )
     }
