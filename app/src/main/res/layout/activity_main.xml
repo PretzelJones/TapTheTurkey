@@ -12,14 +12,19 @@
         android:id="@+id/textScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="50dp"
         android:layout_marginStart="16dp"
         android:text="Score: 0"
-        android:textColor="@android:color/white"
         android:textSize="24sp"
+        android:textColor="#FFFFD700"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:shadowColor="#FF8B0000"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="1.5"
+        />
 
     <LinearLayout
         android:id="@+id/healthContainer"
@@ -77,6 +82,7 @@
         android:layout_marginBottom="16dp"
         android:text="Privacy Policy | Terms of Use"
         android:textColor="@android:color/white"
+        android:visibility="gone"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -132,6 +138,7 @@
             android:layout_marginBottom="32dp"
             android:paddingStart="32dp"
             android:paddingEnd="32dp"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

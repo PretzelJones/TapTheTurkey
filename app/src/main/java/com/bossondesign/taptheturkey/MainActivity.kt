@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         turkey = findViewById(R.id.turkey)
         scoreTextView = findViewById(R.id.textScore)
         gameBoundary = findViewById(R.id.rootConstraintLayout)
+
         val privacyTextView = findViewById<TextView>(R.id.textPrivacy)
 
         gameOverOverlay = findViewById(R.id.gameOverOverlay)
