@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import com.bossondesign.taptheturkey.DifficultyManager.resetGame
 
 class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener {
 
@@ -19,9 +20,9 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
     private lateinit var gameBoundary: ConstraintLayout
     private lateinit var heartViews: List<ImageView>
     private lateinit var gameOverOverlay: View
-    // REMOVED: private lateinit var gameOverText: TextView // This line is gone
     private lateinit var restartButton: Button
     private lateinit var gameOverImage: ImageView
+    private lateinit var whoopsPlayer: MediaPlayer
 
     private var score: Int = 0
     private var health: Int = 3
@@ -44,6 +45,10 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         gameOverOverlay = findViewById(R.id.gameOverOverlay)
         // REMOVED: gameOverText = findViewById(R.id.gameOverText) // This line is gone
         restartButton = findViewById(R.id.restartButton)
+        restartButton.setBackgroundColor(
+            android.graphics.Color.rgb(245, 150, 40)
+        )
+        restartButton.setTextColor(android.graphics.Color.WHITE)
         gameOverImage = findViewById(R.id.gameOverImage)
 
         heartViews = listOf(
@@ -54,6 +59,7 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
 
         // 2. Setup systems
         mp = MediaPlayer.create(this, R.raw.gobble)
+        whoopsPlayer = MediaPlayer.create(this, R.raw.whoops)
         privacyTextView.movementMethod = LinkMovementMethod.getInstance()
         DifficultyManager.setLevelChangeListener(this)
         restartButton.setOnClickListener { resetGame() }
@@ -69,15 +75,56 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         }
     }
 
-    // --- LISTENER SETUP ---
-
     private fun setupTurkeyClickListener() {
         turkey.setOnClickListener {
             if (isGameOver) return@setOnClickListener
 
-            if (TurkeyMover.isRed) {
+            // Tapped turkey shows tapped sprite
+            turkey.setImageResource(R.drawable.turkey_tapped)
+
+            // Original whoops behavior
+            if (TurkeyFlasher.isFlashing) {
+                TurkeyFlasher.flashRedOnTap(turkey)
                 health--
                 updateHearts()
+
+                whoopsPlayer.seekTo(0)
+                whoopsPlayer.start()
+
+                checkGameOverAndWinConditions()
+                return@setOnClickListener
+            }
+
+            // Normal tap logic
+            score++
+            updateScoreText()
+
+            TurkeyAnimator.shake(turkey)
+
+            if (mp.isPlaying) {
+                mp.stop()
+                mp.prepare()
+            }
+            mp.start()
+
+            checkGameOverAndWinConditions()
+        }
+    }
+/*
+    private fun setupTurkeyClickListener() {
+        turkey.setOnClickListener {
+            if (isGameOver) return@setOnClickListener
+
+            turkey.setImageResource(R.drawable.turkey_tapped)
+
+            // Lose a heart whenever the turkey is in its flashing state
+            if (TurkeyFlasher.isFlashing) {
+                health--
+                updateHearts()
+
+                // If you added this, it will switch the flash to red:
+                TurkeyFlasher.flashRedOnTap(turkey)
+                // And here is where you’d play "whoops" instead of mp if you set that up
             } else {
                 score++
                 updateScoreText()
@@ -90,7 +137,7 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
             checkGameOverAndWinConditions()
         }
     }
-
+*/
     private fun setupMissClickListener() {
         gameBoundary.setOnClickListener {
             if (isGameOver) return@setOnClickListener
@@ -204,6 +251,7 @@ class MainActivity : AppCompatActivity(), DifficultyManager.LevelChangeListener 
         super.onDestroy()
         TurkeyMover.stopMovement()
         mp.release()
+        whoopsPlayer.release()
     }
 }
 

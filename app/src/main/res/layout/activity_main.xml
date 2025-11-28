@@ -15,12 +15,12 @@
         android:layout_marginTop="50dp"
         android:layout_marginStart="16dp"
         android:text="Score: 0"
-        android:textSize="24sp"
-        android:textColor="#FFFFD700"
+        android:textSize="32sp"
+        android:textColor="#9aae31"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:shadowColor="#FF8B0000"
+        android:shadowColor="#000000"
         android:shadowDx="3"
         android:shadowDy="3"
         android:shadowRadius="1.5"
@@ -38,24 +38,24 @@
 
         <ImageView
             android:id="@+id/heart1"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginEnd="4dp"
             android:contentDescription="Heart 1"
             android:src="@drawable/heart_full" />
 
         <ImageView
             android:id="@+id/heart2"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginEnd="4dp"
             android:contentDescription="Heart 2"
             android:src="@drawable/heart_full" />
 
         <ImageView
             android:id="@+id/heart3"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="Heart 3"
             android:src="@drawable/heart_full" />
     </LinearLayout>

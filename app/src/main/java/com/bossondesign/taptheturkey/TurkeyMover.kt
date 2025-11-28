@@ -123,6 +123,8 @@ object TurkeyMover {
         val turkey = currentTurkey!!
         val boundaryView = currentBoundaryView!!
 
+        turkey.setImageResource(R.drawable.turkey_run)
+
         // Apply appearance (size)
         val selectedAppearance = currentAllowedAppearances.random(Random)
         turkey.layoutParams.width = selectedAppearance.width
@@ -141,9 +143,11 @@ object TurkeyMover {
         turkey.x = randomX
         turkey.y = randomY
 
-        // Randomly decide if the turkey should flash red
+        // Randomly flip turkey horizontally
+        turkey.scaleX = if (Random.nextBoolean()) 1f else -1f
+
         if (Random.nextInt(100) < currentFlashChancePercent) {
-            // Change this line:
+
             TurkeyFlasher.startFlashing(turkey, 1000)
             isRed = true
         } else {

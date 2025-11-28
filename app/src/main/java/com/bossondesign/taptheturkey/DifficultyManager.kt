@@ -38,7 +38,7 @@ object DifficultyManager {
             moveDelayMs = 1200L, flashChancePercent = 15, missPenalty = 1,
             //allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.TINY }, // Exclude TINY
             allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.TINY && it != TurkeyAppearance.SMALL && it != TurkeyAppearance.MEDIUM_SMALL },
-            turkeyBaseResId = R.drawable.turkey_1,
+            turkeyBaseResId = R.drawable.turkey_run,
             backgroundResId = R.drawable.background // Placeholder
         ),
         // Level 1 (II: Sharpshooter) - Score 30+ (using temporary test score 5)
@@ -47,7 +47,7 @@ object DifficultyManager {
             moveDelayMs = 1000L, flashChancePercent = 25, missPenalty = 1,
             //allowedAppearances = TurkeyAppearance.APPEARANCES, // All 6 sizes are active
             allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.TINY && it != TurkeyAppearance.SMALL },
-            turkeyBaseResId = R.drawable.turkey_2,
+            turkeyBaseResId = R.drawable.turkey_run,
             backgroundResId = R.drawable.background // Placeholder
         ),
         // Level 2 (III: Expert) - Score 75+ (using temporary test score 10)
@@ -55,7 +55,7 @@ object DifficultyManager {
             levelName = "Expert", scoreThreshold = 10,
             moveDelayMs = 800L, flashChancePercent = 35, missPenalty = 2,
             allowedAppearances = TurkeyAppearance.APPEARANCES.filter { it != TurkeyAppearance.HUGE }, // Exclude HUGE
-            turkeyBaseResId = R.drawable.turkey_3,
+            turkeyBaseResId = R.drawable.turkey_run,
             backgroundResId = R.drawable.background // Placeholder
         ),
         // Level 3 (IV: Master) - Score 150+ (using temporary test score 15)
@@ -63,7 +63,7 @@ object DifficultyManager {
             levelName = "Master", scoreThreshold = 15,
             moveDelayMs = 700L, flashChancePercent = 50, missPenalty = 2,
             allowedAppearances = listOf(TurkeyAppearance.TINY, TurkeyAppearance.SMALL, TurkeyAppearance.MEDIUM_SMALL, TurkeyAppearance.MEDIUM),
-            turkeyBaseResId = R.drawable.turkey_4,
+            turkeyBaseResId = R.drawable.turkey_run,
             backgroundResId = R.drawable.background // Placeholder
         ),
         // Level 4 (V: Legendary) - Score 220+ (using temporary test score 20)
@@ -71,7 +71,7 @@ object DifficultyManager {
             levelName = "Legendary", scoreThreshold = 20,
             moveDelayMs = 600L, flashChancePercent = 60, missPenalty = 3,
             allowedAppearances = listOf(TurkeyAppearance.TINY, TurkeyAppearance.SMALL), // Only the two smallest targets
-            turkeyBaseResId = R.drawable.turkey_5,
+            turkeyBaseResId = R.drawable.turkey_run,
             backgroundResId = R.drawable.background // Placeholder
         )
     )

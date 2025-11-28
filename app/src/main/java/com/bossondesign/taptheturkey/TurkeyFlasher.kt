@@ -11,6 +11,9 @@ object TurkeyFlasher {
     private val handler = Handler(Looper.getMainLooper())
     var isFlashing = false
     private val flashInterval: Long = 100
+    val flashColor = Color.argb(180, 255, 255, 255)
+    val redFlash = Color.argb(180, 255, 0, 0)
+    private var currentFlashColor = flashColor
 
     /**
      * Starts the rapid color flash effect on the turkey.
@@ -18,6 +21,7 @@ object TurkeyFlasher {
     fun startFlashing(turkey: ImageView, durationMs: Long) {
         if (isFlashing) return
 
+        currentFlashColor = flashColor
         isFlashing = true
         var isToggledOn = false
 
@@ -49,12 +53,17 @@ object TurkeyFlasher {
         setTurkeyTint(turkey, false)
     }
 
+    fun flashRedOnTap(turkey: ImageView) {
+        if (!isFlashing) return
+        currentFlashColor = redFlash
+    }
+
     private fun setTurkeyTint(turkey: ImageView, applyRedTint: Boolean) {
         val originalDrawable = turkey.drawable ?: return
         val wrappedDrawable = DrawableCompat.wrap(originalDrawable.mutate())
 
         if (applyRedTint) {
-            DrawableCompat.setTint(wrappedDrawable, Color.RED)
+            DrawableCompat.setTint(wrappedDrawable, currentFlashColor)
         } else {
             DrawableCompat.setTintList(wrappedDrawable, null)
         }
